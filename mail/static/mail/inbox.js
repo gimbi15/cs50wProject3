@@ -24,6 +24,28 @@ function compose_email() {
   document.querySelector('#compose-body').value = '';
 }
 
+function load_mails(emails) {
+  emails.forEach(email =>{
+    
+    let shortEmail = document.createElement("div"); //create div for short email view
+    shortEmail.classList.add("border", "border-3", "short-email", "m-2"); //bootstrap classes
+    let sender = document.createElement("p");
+    sender.innerHTML = `${email.sender}`;
+    sender.classList.add("m-2");
+    let subject = document.createElement("p");
+    subject.innerHTML = `${email.subject}`;
+    subject.classList.add("m-2");
+    let timestamp = document.createElement("p");
+    timestamp.innerHTML = `${email.timestamp}`// create <p>'s with email content
+    timestamp.classList.add("m-2","float-end");
+    shortEmail.appendChild(sender);
+    shortEmail.appendChild(subject);
+    shortEmail.appendChild(timestamp); // add elements to short mail div
+    document.getElementById('emails-view').appendChild(shortEmail); // add everything to DOM
+
+  });
+}
+
 function load_mailbox(mailbox) {
   
   // Show the mailbox and hide other views
@@ -38,24 +60,17 @@ function load_mailbox(mailbox) {
     // Print emails
     console.log(emails);  
 
-    emails.forEach(element => {
-      console.log(element.body); 
+    load_mails(emails);
     });
-});
-
 }
 
 function send_email() {
-  rec = document.querySelector('#compose-recipients').value;
-  sub = document.querySelector('#compose-subject').value;
-  bod = document.querySelector("#compose-body").value;
-  console.log(`${rec}, ${sub}, ${bod}`);
   fetch('emails',{
     method : "POST",
     body: JSON.stringify({
-      recipients: rec,
-      subject: sub,
-      body: bod 
+      recipients: document.querySelector('#compose-recipients').value,
+      subject: document.querySelector('#compose-subject').value,
+      body: document.querySelector("#compose-body").value 
     })
   })
   .then(response => response.json())
