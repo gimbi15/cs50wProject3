@@ -6,3 +6,11 @@ textarea {
     display: block ruby;
     width: 100%;
 }
+
+#email-view{
+    display: none;
+}
+
+#email-view span{
+    font-weight: bold;
+}

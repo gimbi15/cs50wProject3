@@ -15,6 +15,7 @@ function compose_email() {
 
   // Show compose view and hide other views
   document.querySelector('#emails-view').style.display = 'none';
+  document.querySelector('#email-view').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'block';
   document.querySelector('#send').addEventListener('click', send_email);
 
@@ -29,6 +30,7 @@ function load_mails(emails) {
     
     let shortEmail = document.createElement("div"); //create div for short email view
     shortEmail.classList.add("border", "border-3", "short-email", "m-2"); //bootstrap classes
+    shortEmail.addEventListener('click', () => load_email(email.id));
     let sender = document.createElement("p");
     sender.innerHTML = `${email.sender}`;
     sender.classList.add("m-2");
@@ -50,6 +52,7 @@ function load_mailbox(mailbox) {
   
   // Show the mailbox and hide other views
   document.querySelector('#emails-view').style.display = 'block';
+  document.querySelector('#email-view').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'none';
 
   // Show the mailbox name
@@ -78,4 +81,44 @@ function send_email() {
     console.log(result)
   });
   load_mailbox('sent');
+
+}
+
+function load_email(email_id){
+  fetch(`/emails/${email_id}`)
+.then(response => response.json())
+.then(email => {
+    // Print email
+    console.log(email);
+    let view = document.querySelector('#email-view');
+    view.replaceChildren();//clear previous mail
+    document.querySelector('#emails-view').style.display = 'none';
+    view.style.display = 'block';
+    document.querySelector('#compose-view').style.display = 'none';
+    let body = document.createElement('p');
+    body.innerHTML = email.body;
+    let sender = document.createElement('p');
+    sender.innerHTML = `<span>From:</span> ${email.sender}`;
+    recipients = document.createElement('p');
+    recipients.innerHTML = '<span>To:</span>'
+
+    email.recipients.forEach(recipient =>{
+      recipients.innerHTML += ` ${recipient}`; // add all recipients
+    })
+
+    let subject = document.createElement('p');
+    subject.innerHTML = `<span>Subject: </span>${email.subject}`;
+    let timestamp = document.createElement('p');
+    timestamp.innerHTML = `<span>Timestamp: </span>${email.timestamp}`;
+    view.appendChild(sender);
+    view.appendChild(recipients);
+    view.appendChild(subject);
+    view.appendChild(timestamp);
+    bar = document.createElement('hr');
+    view.appendChild(bar);
+    view.appendChild(body);
+
+});
+
+
 }
