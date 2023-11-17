@@ -44,6 +44,9 @@ function load_mails(emails) {
     shortEmail.appendChild(subject);
     shortEmail.appendChild(timestamp); // add elements to short mail div
     document.getElementById('emails-view').appendChild(shortEmail); // add everything to DOM
+    if (!email.read){
+      shortEmail.style.backgroundColor = "silver";
+    }
 
   });
 }
@@ -65,6 +68,7 @@ function load_mailbox(mailbox) {
 
     load_mails(emails);
     });
+    
 }
 
 function send_email() {
@@ -110,15 +114,35 @@ function load_email(email_id){
     subject.innerHTML = `<span>Subject: </span>${email.subject}`;
     let timestamp = document.createElement('p');
     timestamp.innerHTML = `<span>Timestamp: </span>${email.timestamp}`;
+    let read = document.createElement('h1');
+    read.innerHTML = email.read;
+    let archive = document.createElement('button');
+
+    bar = document.createElement('hr'); //create elements for mail
+
     view.appendChild(sender);
     view.appendChild(recipients);
     view.appendChild(subject);
     view.appendChild(timestamp);
-    bar = document.createElement('hr');
     view.appendChild(bar);
-    view.appendChild(body);
+    view.appendChild(body);//add elements to DOM
+    view.appendChild(read);
+
+    if(!email.read && email.recipients.includes(document.querySelector('#user').innerHTML)){//check for ownership
+      mark_as_read(email);      
+    }
 
 });
 
+
+}
+
+function mark_as_read(email){
+  fetch(`/emails/${email.id}`, {
+    method: 'PUT',
+    body: JSON.stringify({
+        read: true
+    })
+  });
 
 }

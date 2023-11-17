@@ -14,5 +14,8 @@
             {% block body %}
             {% endblock %}
         </div>
+        <{% if user.is_authenticated %}
+            <div hidden id="user">{{user.username}}</div>
+        {% endif %}
     </body>
 </html>
