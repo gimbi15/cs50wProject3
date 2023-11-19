@@ -5,6 +5,7 @@ textarea {
 .short-email{
     display: block ruby;
     width: 100%;
+    border: 3px solid gray;
 }
 
 #email-view{
