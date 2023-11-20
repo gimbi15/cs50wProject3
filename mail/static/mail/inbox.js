@@ -25,7 +25,7 @@ function compose_email() {
   document.querySelector('#compose-body').value = '';
 }
 
-function load_mails(emails) {
+function load_mails(emails, mailbox) {
   emails.forEach(email =>{
     let shortEmail = document.createElement("div"); //create div for short email view
     shortEmail.classList.add("short-email", "m-2"); //bootstrap classes
@@ -48,11 +48,13 @@ function load_mails(emails) {
     shortEmail.appendChild(sender);
     shortEmail.appendChild(subject);
      // add elements to short mail div
-    //document.getElementById('emails-view').appendChild(shortEmail); // add everything to DOM
+    let coint = document.createElement('div');
+    coint.classList.add("m-3","d-flex", "flex-row" ,"align-items-center");
     if (!email.read){
       shortEmail.style.backgroundColor = "silver";
     }
-
+    coint.appendChild(shortEmail);
+    if(mailbox!='sent'){
     let archive = document.createElement('button');
     if (email.archived){
       archive.innerHTML = "Unarchive";
@@ -62,13 +64,10 @@ function load_mails(emails) {
     }
     archive.addEventListener('click', () => archivise(email));
     archive.classList.add("btn", "btn-primary", "h-50");
-    let coint = document.createElement('div');
-    coint.classList.add("m-3","d-flex", "flex-row" ,"align-items-center");
-    //coint.style.display = "flex";
-    coint.appendChild(shortEmail);
     coint.appendChild(archive);
+    }
+
     document.getElementById('emails-view').appendChild(coint);
-    //document.getElementById('emails-view').appendChild(archive);
     shortEmail.appendChild(timestamp);
 
   });
@@ -89,7 +88,7 @@ function load_mailbox(mailbox) {
     // Print emails
     console.log(emails);  
 
-    load_mails(emails);
+    load_mails(emails,mailbox);
     });
     
 }
@@ -138,13 +137,17 @@ function load_email(email_id){
     subject.innerHTML = `<span>Subject: </span>${email.subject}`;
     let timestamp = document.createElement('p');
     timestamp.innerHTML = `<span>Timestamp: </span>${email.timestamp}`;
-    
+    reply_btn = document.createElement('button');
+    reply_btn.classList.add("btn", "btn-primary");
+    reply_btn.innerHTML = "Reply";
+    reply_btn.addEventListener('click', () => reply(email));
     bar = document.createElement('hr'); //create elements for mail
 
     view.appendChild(sender);
     view.appendChild(recipients);
     view.appendChild(subject);
     view.appendChild(timestamp);
+    view.appendChild(reply_btn);
     view.appendChild(bar);
     view.appendChild(body);//add elements to DOM
     console.log(document.querySelector('#user').innerHTML);
@@ -188,4 +191,30 @@ function archivise(email){
   }
   setTimeout(() => load_mailbox('inbox'),20);
   
+}
+
+function reply(email){
+  compose_email();
+  fetch(`/emails/${email.id}`)
+.then(response => response.json())
+.then(email => {
+    // Print email
+    console.log(email);
+
+    recipient = email.sender;
+    if(email.subject.slice(0,4)=="Re: "){
+      subject = email.subject;
+    }
+    else{
+      subject = `Re: ${email.subject}` //"On Jan 1 2020, 12:00 AM foo@example.com wrote:"
+    }
+
+    body = `On ${email.timestamp} ${email.sender} wrote: \n \n ${email.body}\n\n`
+    document.querySelector('#compose-recipients').value = recipient;
+    document.querySelector('#compose-subject').value = subject;
+    document.querySelector('#compose-body').value = body;
+  
+    });
+
+
 }
