@@ -29,12 +29,13 @@ function load_mails(emails, mailbox) {
   emails.forEach(email =>{
     let shortEmail = document.createElement("div"); //create div for short email view
     shortEmail.classList.add("short-email", "m-2"); //bootstrap classes
+    shortEmail.style.backgroundColor = "grey";
     shortEmail.addEventListener('click', () => load_email(email.id));
     shortEmail.addEventListener('mousemove', ()=>{
       shortEmail.style.border = "3px solid black"; 
     });
     shortEmail.addEventListener('mouseleave', () =>{
-      shortEmail.style.border = "3px solid grey";
+      shortEmail.style.border = "3px solid darkgrey";
     });
     let sender = document.createElement("p");
     sender.innerHTML = `${email.sender}`;
@@ -51,7 +52,7 @@ function load_mails(emails, mailbox) {
     let coint = document.createElement('div');
     coint.classList.add("m-3","d-flex", "flex-row" ,"align-items-center");
     if (!email.read){
-      shortEmail.style.backgroundColor = "silver";
+      shortEmail.style.backgroundColor = "white";
     }
     coint.appendChild(shortEmail);
     if(mailbox!='sent'){
@@ -104,11 +105,26 @@ function send_email() {
   })
   .then(response => response.json())
   .then(result => {
-    console.log(result)
+    console.log(result);
+    
+    if(result.error){
+      console.log(result.error);
+     
+      if(!document.querySelector(".warning")){
+        warning = document.createElement("p");
+        warning.classList.add("warning")
+        warning.innerHTML = result.error;
+        warning.style.color = "red";
+        document.querySelector("#compose-view").appendChild(warning);
+      }
+      else{
+        warning.innerHTML = result.error;
+      }
+    }
+    else{
+      setTimeout(() => load_mailbox('sent'), 20);
+    }
   });
-  setTimeout(() => load_mailbox('sent'), 20);
-  
-
 }
 
 function load_email(email_id){
